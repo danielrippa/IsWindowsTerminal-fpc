@@ -1,0 +1,40 @@
+program IsWindowsTerminal;
+
+uses
+  SysUtils, Windows, WTUtils;
+
+var
+  ProcessID: LongInt;
+  IsWT: Boolean;
+  ImageName: String;
+  ParentProcessID: DWORD;
+begin
+  if ParamCount = 0 then begin
+    ProcessID := GetCurrentProcessID;
+  end else begin
+
+    if not TryStrToInt(ParamStr(1), ProcessID) then begin
+      Exit;
+    end;
+
+  end;
+
+  IsWT := False;
+
+  while ProcessID > 0 do begin
+
+    ImageName := GetProcessImageName(ProcessID);
+
+    if Pos('WindowsTerminal.exe', ImageName) > 0 then begin
+      IsWT := True;
+      Break;
+    end;
+
+    ParentProcessID := GetParentProcessID(ProcessID);
+
+    ProcessID := ParentProcessID;
+
+  end;
+
+  Write(IsWT);
+end.
